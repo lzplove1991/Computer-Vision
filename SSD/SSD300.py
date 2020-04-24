@@ -40,13 +40,19 @@ class SSD300:
         self.generate_graph()
 
     def generate_graph(self):
-        pass
+        self.input = tf.placeholder(shape=[None, self.img_size[0], self.img_size[1], 3], dtype = tf.float32, name = 'input_image')
 
-    def convolution(self, input, shape, padding, strides, name, batch_normalization = True):
+        self.conv_1_1 = self.convolution(self.input, [3, 3, 3, 32], strides = self.conv_strides_1, name = 'conv_1_1')
+        self.conv_1_2 = self.convolution(self.conv_1_1, [3, 3, 32, 32], strides = self.conv_strides_1, name = 'conv_1_2')
+        self.conv_1_3 = tf.nn.avg_pool(self.conv_1_2, self.pool_size, self.pool_strides, padding = 'SAME',name = 'pool_1_2')
+
+
+
+    def convolution(self, input, shape, strides, padding = 'SAME', batch_normalization = True, name = 'convolution_layers'):
         with tf.variable_scope(name):
             weight = tf.get_variable(initializer = tf.truncated_normal(shape, 0, 1), dtype = tf.float32, name = name + '_weight')
             bias = tf.get_variable(initializer = tf.truncated_normal(shape[-1:], 0, 1),dtype = tf.float32, name = name + '_bias')
-            result = tf.nn.conv2d(input, shape, padding, strides, name = name + '_conv')
+            result = tf.nn.conv2d(input, weight, strides, padding , name = name + '_conv')
             result = tf.nn.bias_add(result, bias)
             if batch_normalization:
                 result = self.batch_normalization(result, name = name + '_bn')
