@@ -221,6 +221,38 @@ def build_model(image_size,
         elif len(swap_channels) == 4:
             return K.stack([tensor[...,swap_channels[0]], tensor[...,swap_channels[1]], tensor[...,swap_channels[2]], tensor[...,swap_channels[3]]], axis=-1)
 
+    def convolution(input,
+                    kernel_size,
+                    strides = (1, 1),
+                    padding = 'same',
+                    pool_size = (2,2),
+                    kernel_initializer = 'he_normal',
+                    batch_normalization = True,
+                    l2_regulizer = l2(l2_reg),
+                    pooling = True,
+                    name = 'convolution'):
+        """
+        convolution for image
+        :param input: Tensor ——> Feature map
+        :param kernel_size: like [3, 3, 64]
+        :param strides: like (2, 2)
+        :param padding:
+        :param kernel_initializer:
+        :param batch_normalization:
+        :param l2_regulizer:
+        :param name:
+        :return:
+        """
+
+        conv = Conv2D(kernel_size[-1], kernel_size[0:2],
+                      strides = strides, padding = padding,
+                      kernel_initializer = kernel_initializer,
+                      kernel_regularizer= l2_regulizer, name = name + '_conv')(input)
+        if batch_normalization:
+            conv = BatchNormalization(axis = 3, momentum = 0.99, name = name +'_bn')(conv)
+        conv = ELU(name = name + '_ELU')(conv)
+        return conv
+
     ############################################################################
     # Build the network.
     ############################################################################
@@ -228,6 +260,84 @@ def build_model(image_size,
     x = Input(shape=(img_height, img_width, img_channels))
 
     # 添加网络结构
+    x1 = Lambda(identity_layer, output_shape = (img_height, img_width, img_channels), name = 'identity_layer')(x)
+    if not (subtract_mean is None):
+        x1 = Lambda(input_mean_normalization, output_shape = (img_height, img_width, img_channels), name = 'subtract_mean_normalization')(x1)
+    if not (divide_by_stddev is None):
+        x1 = Lambda(input_stddev_normalization, output_shape = (img_height, img_width, img_channels), name = 'stddev_normalization')(x1)
+    if swap_channels:
+        x1 = Lambda(input_channel_swap, output_shape = (img_height, img_width, img_channels), name = 'swap_channel')(x1)
+
+    conv1 = convolution(x1, [5, 5, 32], name = 'conv1')
+    pool1 = MaxPooling2D(pool_size = (2, 2), name = 'pool1')(conv1)
+    conv2 = convolution(pool1, [3, 3, 48], name = 'conv2')
+    pool2 = MaxPooling2D(pool_size=(2, 2), name='pool2')(conv2)
+    conv3 = convolution(pool2, [3, 3, 64], name='conv3')
+    pool3 = MaxPooling2D(pool_size=(2, 2), name='pool3')(conv3)
+    conv4 = convolution(pool3, [3, 3, 64], name='conv4')
+    pool4 = MaxPooling2D(pool_size=(2, 2), name='pool4')(conv4)
+    conv5 = convolution(pool4, [3, 3, 48],name='conv5')
+    pool5 = MaxPooling2D(pool_size=(2, 2), name='pool5')(conv5)
+    conv6 = convolution(pool5, [3, 3, 48],name='conv6')
+    pool6 = MaxPooling2D(pool_size=(2, 2), name='pool6')(conv6)
+    conv7 = convolution(pool6, [3, 3, 32], name='conv7')
+
+    classes4 = Conv2D(n_boxes[0] * n_classes, (3, 3), strides = (1, 1), padding = 'same', kernel_initializer = 'he_normal', kernel_regularizer = l2(l2_reg), name = 'classes4')(conv4)
+    classes5 = Conv2D(n_boxes[1] * n_classes, (3, 3), strides = (1, 1), padding = 'same', kernel_initializer = 'he_normal', kernel_regularizer = l2(l2_reg), name = 'classes5')(conv5)
+    classes6 = Conv2D(n_boxes[2] * n_classes, (3, 3), strides = (1, 1), padding = 'same', kernel_initializer = 'he_normal', kernel_regularizer = l2(l2_reg), name = 'classes6')(conv6)
+    classes7 = Conv2D(n_boxes[3] * n_classes, (3, 3), strides = (1, 1), padding = 'same', kernel_initializer = 'he_normal', kernel_regularizer = l2(l2_reg), name = 'classes7')(conv7)
+
+    boxes4 = Conv2D(n_boxes[0] * 4, (3, 3), strides = (1, 1), padding = 'same', kernel_initializer = 'he_normal', kernel_regularizer = l2(l2_reg), name = 'boxes4')(conv4)
+    boxes5 = Conv2D(n_boxes[1] * 4, (3, 3), strides = (1, 1), padding = 'same', kernel_initializer = 'he_normal', kernel_regularizer = l2(l2_reg), name = 'boxes5')(conv5)
+    boxes6 = Conv2D(n_boxes[2] * 4, (3, 3), strides = (1, 1), padding = 'same', kernel_initializer = 'he_normal', kernel_regularizer = l2(l2_reg), name = 'boxes6')(conv6)
+    boxes7 = Conv2D(n_boxes[3] * 4, (3, 3), strides = (1, 1), padding = 'same', kernel_initializer = 'he_normal', kernel_regularizer = l2(l2_reg), name = 'boxes7')(conv7)
+
+    anchor4 = AnchorBoxes(img_height, img_width, this_scale=scales[0], next_scale=scales[1],
+                          aspect_ratios=aspect_ratios[0], two_boxes_for_ar1=two_boxes_for_ar1, this_steps=steps[0],
+                          this_offsets=offsets[0], clip_boxes=clip_boxes, variances=variances, coords=coords,
+                          normalize_coords=normalize_coords, name='anchors4')(boxes4)
+
+    anchor5 = AnchorBoxes(img_height, img_width, this_scale=scales[1], next_scale=scales[2],
+                          aspect_ratios=aspect_ratios[1], two_boxes_for_ar1=two_boxes_for_ar1, this_steps=steps[1],
+                          this_offsets=offsets[1], clip_boxes=clip_boxes, variances=variances, coords=coords,
+                          normalize_coords=normalize_coords, name='anchors5')(boxes5)
+
+    anchor6 = AnchorBoxes(img_height, img_width, this_scale=scales[2], next_scale=scales[3],
+                          aspect_ratios=aspect_ratios[2], two_boxes_for_ar1=two_boxes_for_ar1, this_steps=steps[2],
+                          this_offsets=offsets[2], clip_boxes=clip_boxes, variances=variances, coords=coords,
+                          normalize_coords=normalize_coords, name='anchors6')(boxes6)
+
+    anchor7 = AnchorBoxes(img_height, img_width, this_scale=scales[3], next_scale=scales[4],
+                          aspect_ratios=aspect_ratios[3], two_boxes_for_ar1=two_boxes_for_ar1, this_steps=steps[3],
+                          this_offsets=offsets[3], clip_boxes=clip_boxes, variances=variances, coords=coords,
+                          normalize_coords=normalize_coords, name='anchors7')(boxes7)
+
+    classes_reshape4 = Reshape((-1, n_classes), name = 'classes_reshape4')(classes4)
+    classes_reshape5 = Reshape((-1, n_classes), name = 'classes_reshape5')(classes5)
+    classes_reshape6 = Reshape((-1, n_classes), name = 'classes_reshape6')(classes6)
+    classes_reshape7 = Reshape((-1, n_classes), name = 'classes_reshape7')(classes7)
+
+    boxes_reshape4 = Reshape((-1, 4), name = 'boxes_reshape4')(boxes4)
+    boxes_reshape5 = Reshape((-1, 4), name = 'boxes_reshape5')(boxes5)
+    boxes_reshape6 = Reshape((-1, 4), name = 'boxes_reshape6')(boxes6)
+    boxes_reshape7 = Reshape((-1, 4), name = 'boxes_reshape7')(boxes7)
+
+    anchor_reshape4 = Reshape((-1, 8), name = 'anchor_reshape4')(anchor4)
+    anchor_reshape5 = Reshape((-1, 8), name = 'anchor_reshape5')(anchor5)
+    anchor_reshape6 = Reshape((-1, 8), name = 'anchor_reshape6')(anchor6)
+    anchor_reshape7 = Reshape((-1, 8), name = 'anchor_reshape7')(anchor7)
+
+    classes_concat = Concatenate(axis = 1, name = 'classes_concat')([classes_reshape4, classes_reshape5, classes_reshape6, classes_reshape7])
+    boxes_concat = Concatenate(axis = 1, name = 'boxes_concat')([boxes_reshape4, boxes_reshape5, boxes_reshape6, boxes_reshape7])
+    anchor_concat = Concatenate(axis = 1, name = 'anchor_concat')([anchor_reshape4, anchor_reshape5, anchor_reshape6, anchor_reshape7])
+
+    classes_softmax = Activation('softmax', name='classes_softmax')(classes_concat)
+
+    predictions = Concatenate(axis = 2, name = 'predictions')([classes_softmax, boxes_concat, anchor_concat])
+
+
+
+
 
     if mode == 'training':
         model = Model(inputs=x, outputs=predictions)
