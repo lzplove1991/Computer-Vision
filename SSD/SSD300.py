@@ -63,7 +63,13 @@ class SSD300:
         self.conv_4_3 = tf.nn.avg_pool(self.conv_4_3, self.pool_size, strides = self.pool_strides, padding = 'same', name = 'pool_4_3')
         print("## conv_3_3 shape:" + str(self.conv_4_3.get_shape().as_list()))
 
-
+        self.conv_5_1 = self.convolution(self.conv_4_3, [3, 3, 256, 256], self.conv_strides_1, 'conv_5_1')
+        self.conv_5_2 = self.convolution(self.conv_5_1, [3, 3, 256, 256], self.conv_strides_1, 'conv_5_2')
+        self.conv_5_3 = self.convolution(self.conv_5_2, [3, 3, 256, 256], self.conv_strides_1, 'conv_5_3')
+        self.conv_5_3 = tf.nn.avg_pool(self.conv_5_3, self.pool_size, self.pool_strides, padding='SAME',
+                                       name='pool_5_3')
+        print('##   conv_5_3 shape: ' + str(self.conv_5_3.get_shape().as_list()))
+        
 
 
     def convolution(self, input, shape, strides, padding = 'SAME', batch_normalization = True, name = 'convolution_layers'):
