@@ -44,9 +44,12 @@ class SSD300:
 
         self.conv_1_1 = self.convolution(self.input, [3, 3, 3, 32], strides = self.conv_strides_1, name = 'conv_1_1')
         self.conv_1_2 = self.convolution(self.conv_1_1, [3, 3, 32, 32], strides = self.conv_strides_1, name = 'conv_1_2')
-        self.conv_1_3 = tf.nn.avg_pool(self.conv_1_2, self.pool_size, self.pool_strides, padding = 'SAME',name = 'pool_1_2')
+        self.conv_1_2 = tf.nn.avg_pool(self.conv_1_2, self.pool_size, self.pool_strides, padding = 'SAME',name = 'pool_1_2')
+        print("## conv_1_2 shape:" + str(self.conv_1_2.get_shape().as_list()))
 
-
+        self.conv_2_1 = self.convolution(self.conv_1_2, [3, 3, 32, 64], strides = self.conv_strides_1, name = 'conv_2_1')
+        self.conv_2_2 = self.convolution(self.conv_2_1, [3, 3, 64, 64], strides = self.conv_strides_1, name = 'conv_2_2')
+        print("## conv_1_2 shape:" + str(self.conv_2_2.get_shape().as_list()))
 
     def convolution(self, input, shape, strides, padding = 'SAME', batch_normalization = True, name = 'convolution_layers'):
         with tf.variable_scope(name):

@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f37debc9-f809-424b-a6d6-1867598fe2aa" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SSD/SSD300.py" beforeDir="false" afterPath="$PROJECT_DIR$/SSD/SSD300.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -15,8 +16,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/SSD/SSD300.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="59">
-              <caret line="35" column="40" lean-forward="true" selection-start-line="35" selection-start-column="40" selection-end-line="35" selection-end-column="40" />
+            <state relative-caret-position="247">
+              <caret line="49" column="62" selection-start-line="49" selection-start-column="62" selection-end-line="49" selection-end-column="62" />
               <folding>
                 <element signature="e#94#112#0" expanded="true" />
               </folding>
@@ -28,7 +29,7 @@
         <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages/tensorflow/python/ops/gen_nn_ops.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="400">
-              <caret line="939" column="42" lean-forward="true" selection-start-line="939" selection-start-column="42" selection-end-line="939" selection-end-column="42" />
+              <caret line="939" column="42" selection-start-line="939" selection-start-column="42" selection-end-line="939" selection-end-column="42" />
             </state>
           </provider>
         </entry>
@@ -72,8 +73,8 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="164" />
-    <option name="y" value="23" />
+    <option name="x" value="410" />
+    <option name="y" value="37" />
     <option name="width" value="1266" />
     <option name="height" value="834" />
   </component>
@@ -89,11 +90,6 @@
             <path>
               <item name="Computer-Vision" type="b2602c69:ProjectViewProjectNode" />
               <item name="Computer-Vision" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Computer-Vision" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Computer-Vision" type="462c0819:PsiDirectoryNode" />
-              <item name="SSD" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -165,15 +161,15 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1587734729638</updated>
-      <workItem from="1587734732736" duration="6178000" />
+      <workItem from="1587734732736" duration="6798000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="6178000" />
+    <option name="totallyTimeSpent" value="6798000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="164" y="23" width="1266" height="834" extended-state="0" />
+    <frame x="410" y="37" width="1266" height="834" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Favorites" side_tool="true" />
@@ -216,14 +212,14 @@
     <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages/tensorflow/python/ops/gen_nn_ops.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="400">
-          <caret line="939" column="42" lean-forward="true" selection-start-line="939" selection-start-column="42" selection-end-line="939" selection-end-column="42" />
+          <caret line="939" column="42" selection-start-line="939" selection-start-column="42" selection-end-line="939" selection-end-column="42" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/SSD/SSD300.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="59">
-          <caret line="35" column="40" lean-forward="true" selection-start-line="35" selection-start-column="40" selection-end-line="35" selection-end-column="40" />
+        <state relative-caret-position="247">
+          <caret line="49" column="62" selection-start-line="49" selection-start-column="62" selection-end-line="49" selection-end-column="62" />
           <folding>
             <element signature="e#94#112#0" expanded="true" />
           </folding>
