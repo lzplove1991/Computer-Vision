@@ -51,6 +51,21 @@ class SSD300:
         self.conv_2_2 = self.convolution(self.conv_2_1, [3, 3, 64, 64], strides = self.conv_strides_1, name = 'conv_2_2')
         print("## conv_1_2 shape:" + str(self.conv_2_2.get_shape().as_list()))
 
+        self.conv_3_1 = self.convolution(self.conv_2_2, [3, 3, 64, 128], strides = self.conv_strides_1, name = 'conv_3_1')
+        self.conv_3_2 = self.convolution(self.conv_3_1, [3, 3, 128, 128], strides = self.conv_strides_1, name = 'conv_3_2')
+        self.conv_3_3 = self.convolution(self.conv_3_2, [3, 3, 128, 128], strides = self.conv_strides_1, name = 'conv_3_3')
+        self.conv_3_3 = tf.nn.avg_pool(self.conv_3_3, self.pool_size, strides = self.pool_strides, padding = 'same', name = 'pool_3_3')
+        print("## conv_3_3 shape:" + str(self.conv_3_3.get_shape().as_list()))
+
+        self.conv_4_1 = self.convolution(self.conv_3_2, [3, 3, 128, 256], strides=self.conv_strides_1, name='conv_4_1')
+        self.conv_4_2 = self.convolution(self.conv_4_1, [3, 3, 256, 256], strides = self.conv_strides_1, name = 'conv_4_2')
+        self.conv_4_3 = self.convolution(self.conv_4_2, [3, 3, 256, 256], strides = self.conv_strides_1, name = 'conv_4_3')
+        self.conv_4_3 = tf.nn.avg_pool(self.conv_4_3, self.pool_size, strides = self.pool_strides, padding = 'same', name = 'pool_4_3')
+        print("## conv_3_3 shape:" + str(self.conv_4_3.get_shape().as_list()))
+
+
+
+
     def convolution(self, input, shape, strides, padding = 'SAME', batch_normalization = True, name = 'convolution_layers'):
         with tf.variable_scope(name):
             weight = tf.get_variable(initializer = tf.truncated_normal(shape, 0, 1), dtype = tf.float32, name = name + '_weight')
